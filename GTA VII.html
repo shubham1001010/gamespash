@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babylon.js Cube to Sphere Animation</title>
+  <style>
+    body , html { margin: 0; overflow: hidden; height: 100%; width: 100%;}
+    canvas { display: block;height: 100%; width: 100%; }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+</head>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var canvas = document.createElement("canvas");
+      document.body.appendChild(canvas);
+
+      // Initialize Babylon.js
+      var engine = new BABYLON.Engine(canvas, true);
+
+      // Create the scene
+      var scene = new BABYLON.Scene(engine);
+      scene.freezeActiveMeshes(true);
+
+      function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+      // Create a camera
+      //   var camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 4, 5, new BABYLON.Vector3(0, 1, 0), scene);
+    // camera.attachControl(canvas, true);
+      var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 5, -10), scene);
+
+
+      //       // Target the camera to scene origin
+             camera.setTarget(BABYLON.Vector3.Zero());
+             camera.position.y += 15;
+             camera.position.z -= 45;
+             camera.rotation.x -= toRadians(25);
+
+    // Set the camera target to the position of the box (or any other mesh)
+    // camera.setTarget(box.position);
+
+            // Attach the camera to the canvas
+            camera.attachControl(canvas, true);
+            camera.speed = 2;
+            
+            camera.fov = 0.3;
+            
+
+      // Create a light
+      var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
+      // Create a cube
+      var cube = BABYLON.MeshBuilder.CreateBox("cube", { height:1, width:50 , depth : 50 }, scene);
+
+      var ground = BABYLON.MeshBuilder.CreateGround( "https://upload.wikimedia.org/wikipedia/commons/5/57/Heightmap.png", {
+        width: 1000,
+        height: 1000,
+        depth: 100,
+        subdivisions: 100,
+        minHeight: 0,
+        maxHeight: 15,
+    }, scene);
+    cube.position = new BABYLON.Vector3(0, 2, 0);
+
+
+      cube.visibility = false;
+      //ground.visibility = false;
+
+    var material1 = new BABYLON.StandardMaterial("sphereMaterial", scene);
+            
+          //material1.diffuseTexture = new BABYLON.Texture("https://lh3.googleusercontent.com/u/0/drive-viewer/AK7aPaDQ8wvDbATxh-DezylUDEiIhpD4j8VfeVG0CrxtEIq4abMha0KbB1FR-AMSxIrV5NV4CvDQCWjkEPdXnKXFISFFJ-l5RQ=w1024-h657", scene);
+//material1.wireframe = true;
+    // //         // Apply the material to the sphere\
+    material1.diffuseTexture = new BABYLON.Texture("https://t4.ftcdn.net/jpg/04/97/94/51/360_F_497945136_fZK0Hf3xuDRVnJJPb1aPHZAyYRX0qK0E.jpg", scene);
+          ground.material = material1;
+
+
+          BABYLON.SceneLoader.ImportMesh("","","mp40.glb",scene, function(newMeshes, particleSystems, skeletons, animationGroups){
+            const gun = newMeshes[0];
+            gun.scaling = new BABYLON.Vector3(15, 15, 15);
+            gun.rotation = new BABYLON.Vector3(toRadians(180),toRadians(180),toRadians(180));
+            gun.position.y = 10;
+            gun.position.x = 3;
+          });
+
+          BABYLON.SceneLoader.ImportMesh("","","sss.glb",scene, function(newMeshes, particleSystems, skeletons, animationGroups){
+            const house = newMeshes[0];
+            house.scaling = new BABYLON.Vector3(10,10,10);
+            house.position.z += 90;
+            animationGroups[0].play(true);
+          });
+
+          BABYLON.SceneLoader.ImportMesh("","","lambo.glb",scene, function(newMeshes, particleSystems, skeletons, animationGroups){
+            const lambo = newMeshes[0];
+            lambo.scaling = new BABYLON.Vector3(10,10,10);
+            lambo.position.z += 90;
+            lambo.position.x -= 45;
+            animationGroups[1].play(true);
+          });
+
+
+BABYLON.SceneLoader.ImportMesh("", "https://assets.babylonjs.com/meshes/", "HVGirl.glb", scene, function (newMeshes, particleSystems, skeletons, animationGroups) {
+  const hero = newMeshes[0];
+  animationGroups[0].play(true);
+
+  scene.onKeyboardObservable.add((kbInfo) => {
+      switch (kbInfo.type) {
+        case BABYLON.KeyboardEventTypes.KEYDOWN:
+          handleKeyDown(kbInfo.event.key);
+          break;
+        case BABYLON.KeyboardEventTypes.KEYUP:
+          handleKeyUp(kbInfo.event.key);
+          break;
+      }
+    });
+
+  var speed = 0.1;
+    function handleKeyDown(key) {
+      switch (key) {
+        case "w":
+          hero.position.z += speed;
+         
+          camera.position.z += speed;
+          hero.rotation = new BABYLON.Vector3(0,toRadians(180), 0);
+          animationGroups[2].play(true);
+          break;
+        case "s":
+          hero.position.z -= speed;
+          
+          camera.position.z -= speed;
+          hero.rotation = new BABYLON.Vector3(0,toRadians(180), 0);
+          animationGroups[3].play(true);
+          break;
+        case "a":
+          hero.position.x -= speed;
+          
+          camera.position.x -= speed;
+          hero.rotation = new BABYLON.Vector3(0, toRadians(90), 0);
+          animationGroups[2].play(true);
+          break;
+        case "d":
+          hero.position.x += speed;
+          
+          camera.position.x += speed;
+          hero.rotation = new BABYLON.Vector3(0,toRadians(-90), 0);
+          animationGroups[2].play(true);
+          break;
+      }
+    }
+    function handleKeyUp(key) {
+      // Handle key release here
+      if (key === "w") {
+        isWKeyPressed = false;
+        animationGroups[2].stop();
+        animationGroups[0].play(true);
+        
+        // Perform specific actions for 'W' key release
+      }
+      if (key === "a") {
+        isWKeyPressed = false;
+        animationGroups[2].stop();
+        animationGroups[0].play(true);
+        
+        // Perform specific actions for 'W' key release
+      }
+      if (key === "s") {
+        isWKeyPressed = false;
+        animationGroups[3].stop();
+        animationGroups[0].play(true);
+        
+        // Perform specific actions for 'W' key release
+      }
+      if (key === "d") {
+        isWKeyPressed = false;
+        animationGroups[2].stop();
+        animationGroups[0].play(true);
+        
+        // Perform specific actions for 'W' key release
+      }
+    }
+  });
+  
+
+      // Render loop
+      engine.runRenderLoop(function () {
+        scene.render();
+      });
+
+      // Handle window resize
+      window.addEventListener("resize", function () {
+        engine.resize();
+      });
+    });
+  </script>
+</body>
+</html>
